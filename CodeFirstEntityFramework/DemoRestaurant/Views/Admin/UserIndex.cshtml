@@ -1,0 +1,41 @@
+﻿@using DemoRestaurant.Models;
+@model IEnumerable<ApplicationUser>
+@{
+    ViewBag.Title = "Quản lý thành viên";
+}
+
+<h2>UserIndex</h2>
+
+
+@using (Html.Bootstrap().Begin(new Table()))
+{
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Xác nhận Email</th>
+            <th>Số điện thoại</th>
+            <th>Ngày khóa tài khoản</th>
+            <th>ID</th>
+        </tr>
+    </thead>
+
+
+     foreach (var item in Model)
+    {
+        <tr> 
+        <td>@item.UserName</td>
+        <td>@item.Email</td>
+        <td>@item.EmailConfirmed</td>
+        <td>@item.PhoneNumber</td>
+        <td>@item.LockoutEndDateUtc</td>
+        <td>@item.Id</td>
+        <td>
+            @Html.ActionLink("Sửa thông tin", "EditUser", new { Id= item.Id},null) |
+            @Html.ActionLink("Sửa quyền", "EditUserRole", new { Id = item.Id }, null) |
+            @Html.ActionLink("Xóa", "DeleteUser", new { Id = item.Id }, null)
+        </td>
+        </tr>
+    }
+}
+

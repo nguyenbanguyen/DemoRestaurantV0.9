@@ -1,0 +1,105 @@
+﻿@model  PagedList.IPagedList<DemoRestaurant.ViewModel.ProductViewModel>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+@{
+    ViewBag.Title = "Index";
+}
+<hr />
+@using (Html.BeginForm("Index","Products",FormMethod.Get))
+{
+    <div class="input-group">
+        <p class="submitButton">
+            Tìm theo tên: @Html.TextBox("SearchString")
+            <button type="submit" class="submitButton">Tìm kiếm</button>
+        </p>
+    </div>
+
+}
+
+@if (User.IsInRole("Admin"))
+{
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+}
+<table class="table">
+    <tr>
+        <th>
+            CategoryName
+        </th>
+        <th>
+            ProductName
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            Price
+        </th>
+        <th>
+            Discount
+        </th>
+        <th>
+            MaximunQuantity
+        </th>
+        <th>
+            TotalSold
+        </th>
+        <th></th>
+    </tr>
+
+@for (int i = 0; i < Model.Count(); i = i + 2)
+{
+
+    //cần fix hiển thị product theo hình ảnh, shopping cart và check out sang partial view
+    @*<div>
+        <h1>
+            @Html.ActionLink(Model.ElementAt(i).product.ProductName, "Details", "Product", new { id = Model.ElementAt(i).product.ProductId }, "")
+        </h1>
+        <a class="img-responsive" href="/Product/Details/@Model.ElementAt(i).product.ProductId">
+                Cần fix ảnh product/ cập nhật product theo ảnh
+                <img src="@Model.ElementAt(i).product.Image" alt="@Model.ElementAt(i).product.ProductName" />
+        </a>
+    </div>*@
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => Model.ElementAt(i).product.Category.CategoryName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => Model.ElementAt(i).product.ProductName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => Model.ElementAt(i).product.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => Model.ElementAt(i).product.Price)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => Model.ElementAt(i).product.Discount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => Model.ElementAt(i).product.MaximunQuantity)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => Model.ElementAt(i).product.TotalSold)
+        </td>
+
+@if (User.IsInRole("Admin"))
+{
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = Model.ElementAt(i).product.ProductId }) |
+            @Html.ActionLink("Details", "Details", new { id = Model.ElementAt(i).product.ProductId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = Model.ElementAt(i).product.ProductId })
+        </td>
+}
+        <td>
+            @Html.ActionLink("Chọn món", "AddToCart","ShoppingCart", new { id = Model.ElementAt(i).product.ProductId },null)
+
+        </td>
+    </tr>
+}
+
+</table>
+<div style="text-align: center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, searchString = ViewBag.CurrentFilter }))
+</div>

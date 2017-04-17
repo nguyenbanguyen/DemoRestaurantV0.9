@@ -1,0 +1,245 @@
+
+/**
+ * @fileoverview Custom functionality to apply throughout every adsize. This
+ * has a dependency on common.js and utils.js
+ */
+var custom = (function() {
+
+  /**
+   * Classes which our JS hooks into. Add more class names as necessary.
+   * @enum
+   * @private
+   */
+  var elementClass_ = {
+    item: 'js-item',
+    itemName: 'js-item-name',
+    itemPrice: 'js-item-price',
+    itemSalePrice: 'js-item-salesPrice',
+    itemRegularPrice: 'js-item-regularPrice',
+    itemDiscount: 'js-item-discount-group',
+    itemCTA: 'js-item-mouseover-holder'
+  };
+
+  var elementId_ = {
+    gpaDataProvider: 'gpa-data-provider'
+  };
+
+    /**
+   * Initialization. Must be called from handleAdInitialized on each page.
+   */
+  var items;
+  function init () {
+    utils.log('custom.init()');
+    var data = common.getAdData();
+    console.log("data: ", data);
+    if (!data) return;
+
+    items = document.querySelectorAll('.' + elementClass_.item);
+
+    // If you're not using the swipe gallery to display feed items.
+    initItemsWithoutGallery_();
+
+    setAutoCycle();
+  }
+
+
+  /**
+   * Auto cycle through items on stage.
+   */
+  
+  var autoCycleInt;
+  var cancelTimeout;
+  function setAutoCycle() {
+    var itemsLength = Math.min(items.length, common.getAdData().Product.length);
+
+    // Set first item active.
+    activateCurrentItem();
+
+    // Start auto cycle.
+    var autoCycleFrameDur = 2000;
+    autoCycleInt = setInterval(function() {
+      if (common.getCurrentItemIndex() < itemsLength - 1) {
+        common.setCurrentItemNext();
+      } else {
+        common.setCurrentItemIndex(0);
+      }
+
+      activateCurrentItem();
+    }, autoCycleFrameDur);
+
+    // Limit to 30 seconds.
+    var autoCycleLimit = 28000;
+    cancelTimeout = setTimeout(function() {
+      stopAutoCycle();
+      common.setCurrentItemIndex(0); //kent
+      activateCurrentItem(); //kent
+    }, autoCycleLimit);
+  }
+
+  function activateCurrentItem() {
+    var index = common.getCurrentItemIndex();
+    var item = items[index];
+    itemHighlight(item);
+  }
+
+  /**
+   * Stops the autocycle interval.
+   */
+  function stopAutoCycle() {
+    clearInterval(autoCycleInt);
+    clearTimeout(cancelTimeout);
+
+    //common.setCurrentItemIndex(0);
+    //activateCurrentItem();
+  }
+  /**
+   * Highlight functions (replaces mouseOver)
+   */
+
+  /**
+   * highlight item (replaces mouseOver)
+   */
+  function itemHighlight(item) {
+    var adData = common.getAdData();
+    var itemCTA = item.querySelector('.' + elementClass_.itemCTA);
+    itemCTA.style.opacity = 1;
+
+    // Revert other items.
+    for (var i = 0; i < items.length; i++) {
+      var current = items[i];
+      if (item != current) {
+        itemMouseOut(current);
+      }
+    }
+  }
+
+  /**
+   * un-highlight item (replaces mouseOut)
+   */
+  function itemUnHighlight(item) {
+    var itemCTA = item.querySelector('.' + elementClass_.itemCTA);
+    itemCTA.style.opacity = 0;
+  }
+
+  /**
+   * Find all items used in the swipe gallery and initialize custom behavior.
+   * @private
+  
+  function initItemsUsingGallery_() {
+    var gallery = common.getGallery();
+
+    // Apply settings to each item in the gallery
+    var items = gallery.querySelectorAll('.' + elementClass_.item);
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      initItemDisplay_(item);
+    }
+  } */
+
+  /**
+   * Find all items used outside the gallery and initialize custom behavior.
+   * @private
+   */
+  function initItemsWithoutGallery_() {
+    // Apply settings to each item
+    var items = document.querySelectorAll('.' + elementClass_.item);
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      initItemDisplay_(item);
+    }
+  }
+
+  /**
+   * Set the display settings for each item.
+   * Add any custom functionality you need applied on load.
+   * @param {Element} item Item element.
+   * @private
+   */
+  function initItemDisplay_(item) {
+
+    // if you're using sales prices.
+    setSalePricesDisplay_(item);
+
+    // Set mouseout.
+    itemMouseOut(item);
+  }
+
+  /**
+   * Sets the 3 price elements to display correctly when using sales price.
+   * Find your price elements and set into common functionality.
+   * @param {Element} item Item element.
+   * @private
+   */
+  function setSalePricesDisplay_(item) {
+    // Get reference to each price element.
+    var itemPrice = item.querySelector('.' + elementClass_.itemPrice);
+    var itemSalePrice = item.querySelector('.' + elementClass_.itemSalePrice);
+    var itemRegularPrice = item.querySelector('.' + elementClass_.itemRegularPrice);
+
+    // Sets each item to display correct prices.
+    common.displayCorrectPrices(itemPrice, itemSalePrice, itemRegularPrice);
+  }
+
+  /**
+   * Custom Item Mouse Interactions. Add your own behavior.
+   */
+
+  /**
+   * Custom Mouseover interaction functionality.
+   * @param {Element} item
+   */
+  function itemMouseOver(item) {
+    var itemCTA = item.querySelector('.' + elementClass_.itemCTA);
+    itemCTA.style.opacity = 1;
+    var itemDiscount = item.querySelector('.' + elementClass_.itemDiscount);
+    itemDiscount.style.opacity = 0;
+    stopAutoCycle();
+    itemHighlight(item);
+
+
+  }
+
+  /**
+   * Custom Mouseout interaction functionality.
+   * @param {Element} item
+   */
+  function itemMouseOut(item) {
+    var itemCTA = item.querySelector('.' + elementClass_.itemCTA);
+    itemCTA.style.opacity = 0;
+    var itemDiscount = item.querySelector('.' + elementClass_.itemDiscount);
+    itemDiscount.style.opacity = 1;
+    itemUnHighlight(item);
+
+
+  }
+
+
+function transformDynamicData () {
+   var dataProvider = document.querySelector('#' + elementId_.gpaDataProvider);
+   dataProvider.addDataTransformer(function(dynamicData) {
+     var aryProducts = dynamicData.Product;
+     if(!aryProducts) return;
+     for(var i = 0; i < aryProducts.length; i++ ){
+       var discountData = aryProducts[i].salePercentDiscount;
+       if (discountData != null && discountData > 0 && discountData < 1) {
+         var discountText = "-" + Math.round(discountData * 100) + "%";
+         aryProducts[i].salePercentDiscount = discountText;
+       }
+     }
+   });
+ }
+
+  function removeCentsFromString(price){
+  if(! price) return;
+  var matcher = /(\.|\.)0{2}(?![\d])/;
+  return price.replace(matcher, '');
+ }
+
+  return {
+    init: init,
+    itemMouseOver: itemMouseOver,
+    itemMouseOut: itemMouseOut,
+    transformDynamicData:transformDynamicData
+  };
+
+})();

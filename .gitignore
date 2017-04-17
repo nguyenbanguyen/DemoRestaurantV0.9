@@ -240,3 +240,10 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/DemoRestaurant
+/RestaurantManager
+/CodeFirstEntityFramework/WebApplication1.Tests
+/CodeFirstEntityFramework/WebApplication1
+/CodeFirstEntityFramework/UnitTestProject1
+/APIHelpPageToBeDelete/
+/DemoApi/

@@ -1,0 +1,37 @@
+﻿ 
+@model  DemoRestaurant.Models.ApplicationUser
+@{
+    ViewBag.Title = "DeleteUser";
+}
+
+<div class="row">
+
+    <div class="col-sm-12">
+
+        <h2>@ViewBag.Title</h2>
+
+        <hr />
+
+        <div class="text-center">
+
+            <h5>Bạn có chắc muốn xóa thành viên @Model.UserName?</h5>
+
+            @using (var f = Html.Bootstrap().Begin(new Form().Type(FormType.Horizontal).Data(new { Id = Model.Id })))
+
+            {
+
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                @Html.Bootstrap().SubmitButton().Text("Chấp nhận")
+                @Html.Bootstrap().ActionLinkButton("Không xóa", "UserIndex")
+
+            }
+
+        </div>
+
+    </div>
+
+</div>
+

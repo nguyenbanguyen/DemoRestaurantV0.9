@@ -1,0 +1,21 @@
+﻿@model  List<DemoRestaurant.Models.Category>
+
+
+    
+      
+         @*@foreach (var item in Model){<a href="/Products/Index/?category=@item.CategoryName">@item.CategoryName</a>}*@
+        <li role="presentation" class="dropdown" style="background-color:#222222">
+            <a class="dropdown-toggle" data-toggle="dropdown" @*href="#"*@ role="button" aria-haspopup="true" aria-expanded="false">
+                Category <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" style="background-color:#222222">
+                @foreach (var item in Model)
+                {
+                    <li><a href="/Products/Index/?category=@item.CategoryName" style="color:white">@item.CategoryName</a></li> }
+
+            </ul>
+        </li>
+    
+
+
+

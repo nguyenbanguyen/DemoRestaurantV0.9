@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNet.Identity.EntityFramework;
+
+
+@model IEnumerable<IdentityRole>
+@{
+    ViewBag.Title = "Admin page";
+}
+<h2>@ViewBag.Title</h2>
+
+@Html.ActionLink("Tạo Role", "CreateRole", null, new { @class="btn btn-primary"})
+
+
+@using (Html.Bootstrap().Begin(new Table())){
+<thead>
+    <tr>
+        <th>ID</th>
+        <th>Tên Quyền</th>
+        <th>Thao Tác</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach(var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Name</td>
+            <td>@Html.ActionLink("Xóa","DeleteRole",new { id = item.Id })</td>
+        </tr>
+    }
+</tbody>
+}
+
+
+

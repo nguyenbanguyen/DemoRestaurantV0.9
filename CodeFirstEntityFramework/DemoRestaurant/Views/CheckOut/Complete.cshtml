@@ -1,0 +1,13 @@
+﻿@model int?
+@{
+    ViewBag.Title = "Đặt hàng thành công";
+}
+<div>
+    <h3>Đặt hàng thành công</h3>
+
+    <p>Cám ơn quý khách, mã số giao dịch của quý khách là: @Model</p>
+</div>
+<p>
+    Cảm ơn quý khách đã sử dụng dịch vụ của công ty
+    @Html.ActionLink("Home","Index", "Home")
+</p>

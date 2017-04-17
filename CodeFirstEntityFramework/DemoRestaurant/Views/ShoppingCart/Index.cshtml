@@ -1,0 +1,93 @@
+﻿@model DemoRestaurant.ViewModel.ShoppingCartViewModel
+@{
+    ViewBag.Title = "Thanh Toán";
+}
+
+<script src="~/Scripts/jquery-3.1.1.min.js"
+        type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        // Document.ready -> link up remove event handler
+        $(".RemoveLink").click(function () {
+            // Get the id from the link
+            var recordToDelete = $(this).attr("data-id");
+            if (recordToDelete != '') {
+                // Perform the ajax post
+                $.post("/ShoppingCart/RemoveFromCart", {"id": recordToDelete },
+                    function (data) {
+                        // Successful requests get here
+                        // Update the page elements
+                        if (data.ItemCount == 0) {
+                            $('#row-' + data.DeleteId).fadeOut('slow');
+                        } else {
+                            $('#item-count-' + data.DeleteId).text(data.ItemCount);
+                        }
+
+                        $('#cart-total').text(data.CartTotal);
+                        $('#update-message').text(data.Message);
+                        $('#cart-status').text('Cart (' + data.CartCount + ')');
+                    });
+            }
+        });
+    });
+</script>
+<h3>
+    Xem lại giỏ hàng:
+</h3>
+
+<div id="update-message">
+</div>
+<table>
+    <tr>
+        <th>
+            Tên sản phấm
+        </th>
+        <th>
+            Đơn giá sản phẩm
+        </th>
+        <th>
+            Số lượng
+        </th>
+        <th></th>
+    </tr>
+    @foreach (var item in Model.CartItem)
+    {
+        <tr id="row-@item.RecordId">
+            <td>
+                @*@Html.ActionLink(item.Product.ProductName, "Details", "Store", new { id = item.ProductId }, null)*@
+                @item.Product.ProductName
+            </td>
+            <td>
+               @{string priceview = (@item.Product.Price).ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("vi-VN"));
+                   priceview = priceview.Substring(0, priceview.Length - 5) + " VNĐ";
+                <span>@priceview</span>
+            }
+            </td>
+            <td id="item-count-@item.RecordId">
+                <input id="num-@item.ProductId" class="p-quantity"  data-pid="@item.ProductId" data-id="@item.RecordId" type="text" value="@item.ProductQuantity" />
+            </td>
+            <td>
+                <a href="#" class="RemoveLink"  data-id="@item.RecordId">  Loại khỏi danh sách </a>
+            </td>
+        </tr>
+    }
+    <tr>
+        <td>
+            Total
+        </td>
+        <td></td>
+        <td></td>
+        <td id="cart-total">
+            @{string price = (@Model.CartTotal).ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("vi-VN"));
+                price = price.Substring(0, price.Length - 5) + " VNĐ";
+
+                <br />
+                <span>Tổng cộng: </span><span>@price</span>
+            }
+        </td>
+    </tr>
+</table>
+<p class="button">
+    
+    @Html.ActionLink(" Thanh Toán >> ", "AddressAndPayment", "CheckOut")
+</p>
